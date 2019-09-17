@@ -1,0 +1,21 @@
+.lt-watch-yt-container {
+  width: 100%;
+  height: 70vh;
+}
+
+.lt-watch-text-container {
+  display: flex;
+  align-items: center;
+  padding: 20px 0px 0px 0px;
+}
+
+.lt-watch-text-left, .lt-watch-text-right {
+  height: 90px;
+  width: 90px;
+}
+
+.lt-watch-text-content {
+  flex: 1;
+  text-align: center;
+  font-size: 1.5rem;
+}
