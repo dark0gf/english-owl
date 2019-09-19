@@ -77,7 +77,7 @@ const updateText = async () => {
   }
   prevTime = time;
   let text = '';
-  console.log(time);
+
   for (const tData of videoData.textData) {
     if (tData.s <= time && time <= tData.e) {
       text = tData.t;

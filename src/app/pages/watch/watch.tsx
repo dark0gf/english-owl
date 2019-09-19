@@ -5,8 +5,7 @@ import * as service from './service';
 import { connect } from 'react-redux';
 import { IPage } from './interfaces';
 import Button from '@material-ui/core/Button';
-import './style.css';
-// import Button from '@material-ui/core/Button';
+import './styles.css';
 
 const connected: React.ComponentType<any> = connect(service.getState)(
   (props: IPage) => {
