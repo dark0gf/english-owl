@@ -19,7 +19,7 @@ const MainLayout = ({ children }: { children: any }) => (<div>
          noWrap
          style={{flex: 1}}
        >
-         Lingualtool
+         English Owl
        </Typography>
       {/*<Button variant="outlined" size="small" className='mr-2'>*/}
       {/*  Войти*/}
@@ -30,6 +30,8 @@ const MainLayout = ({ children }: { children: any }) => (<div>
     </Toolbar>
 
     {children}
+
+    <Toolbar><Typography align="center" style={{flex: 1}}>English Owl 2019 (c)</Typography></Toolbar>
 
   </Container>
 </div>);

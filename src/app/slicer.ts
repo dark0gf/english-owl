@@ -1,5 +1,6 @@
 import { get, set } from "lodash";
 import { Store } from 'redux';
+import { connect } from 'react-redux';
 
 const GENERIC_ACTION_PREFIX = 'GENERIC';
 
@@ -56,6 +57,11 @@ class StoreSlicer<StateType> {
     this.dispatch(() => this.initialState);
   };
 
+  connectToState = (func: (state: StateType) => any) => {
+    connect((state: any) => {
+      func(this.getState(state));
+    });
+  }
 }
 
 const connectStore = (s: Store) => {
