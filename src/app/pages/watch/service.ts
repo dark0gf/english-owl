@@ -40,6 +40,7 @@ export const init = () => {
     pageLoaderService.hide();
     slicer.dispatch((state: any) => ({...state, ready: true}));
     videoData = videoDataMock;
+    videoData.textData.sort((a, b) => (a.s - b.s));
     intervalId = setInterval(updateText , 25);
     const p = (PlayerFactory('yt-player') as any);
     player = (p as YouTubePlayer);
@@ -68,7 +69,7 @@ let prevText = '';
 let prevTime = 0;
 
 const updateText = async () => {
-  if (!player || !videoData) {
+  if (!player) {
     return;
   }
   const time = await player.getCurrentTime();
@@ -76,18 +77,25 @@ const updateText = async () => {
     return;
   }
   prevTime = time;
-  let text = '';
 
-  for (const tData of videoData.textData) {
-    if (tData.s <= time && time <= tData.e) {
-      text = tData.t;
-      break;
-    }
-  }
-
+  let text = searchForText(time);
   if (prevText == text) {
     return;
   }
   prevText = text;
   slicer.dispatch((state) => ({...state, englishText: text}));
+};
+
+const searchForText = (time: number): string  => {
+  if (!videoData) {
+    return "";
+  }
+
+  for (const tData of videoData.textData) {
+    if (tData.s <= time && time <= tData.e) {
+      return tData.t;
+    }
+  }
+
+  return "";
 };

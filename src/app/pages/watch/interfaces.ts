@@ -11,7 +11,9 @@ export interface IVideoData {
    * english subtitles that can be clicked and translated
    * s and e - start and end seconds when to show subtitle
    * t - text of subtitle
-   */
+   * NOTE: array should be sorted by "s" property
+   *
+   **/
   textData: Array<{s: number, e: number, t: string}>
 }
 
