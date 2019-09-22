@@ -79,13 +79,12 @@ export const onLeft = async () => {
   }
 
   const tData = videoData.textData[index];
-  player.seekTo(tData.s, false);
+  player.seekTo(tData.s, true);
 
   return updateText();
 };
 
 export const onRight = async () => {
-  console.log('here');
   if (!player || !videoData) {
     return;
   }
@@ -99,7 +98,7 @@ export const onRight = async () => {
   }
 
   const tData = videoData.textData[index];
-  player.seekTo(tData.s, false);
+  player.seekTo(tData.s, true);
 
   return updateText();
 };
