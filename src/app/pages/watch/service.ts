@@ -65,6 +65,46 @@ export const getState = (state: any): IPage => {
 };
 
 
+export const onLeft = async () => {
+  if (!player || !videoData) {
+    return;
+  }
+  const time = await player.getCurrentTime();
+  let index = searchForClosestPlayedIndexText(time);
+  if (index < 0) {
+    return;
+  }
+  if (index > 0) {
+    index--;
+  }
+
+  const tData = videoData.textData[index];
+  player.seekTo(tData.s, false);
+
+  return updateText();
+};
+
+export const onRight = async () => {
+  console.log('here');
+  if (!player || !videoData) {
+    return;
+  }
+
+  const textDataLength = videoData.textData.length;
+  const time = await player.getCurrentTime();
+  let index = searchForClosestPlayedIndexText(time);
+  index++;
+  if (index >= textDataLength) {
+    return;
+  }
+
+  const tData = videoData.textData[index];
+  player.seekTo(tData.s, false);
+
+  return updateText();
+};
+
+
 let prevText = '';
 let prevTime = 0;
 
@@ -98,4 +138,19 @@ const searchForText = (time: number): string  => {
   }
 
   return "";
+};
+
+const searchForClosestPlayedIndexText = (time: number): number => {
+  if (!videoData) {
+    return -1;
+  }
+
+  let index = -1;
+  videoData.textData.forEach((tData, i) => {
+    if (tData.s <= time) {
+      index = i;
+    }
+  });
+
+  return index;
 };

@@ -22,7 +22,7 @@ const connected: React.ComponentType<any> = connect(service.getState)(
           </div>
           <div className='lt-watch-text-container'>
 
-            <Button variant="outlined" size="small" className='lt-watch-text-left'>
+            <Button variant="outlined" size="small" className='lt-watch-text-left' onClick={service.onLeft}>
               <i className="material-icons">
                 keyboard_arrow_left
               </i>
@@ -33,7 +33,7 @@ const connected: React.ComponentType<any> = connect(service.getState)(
             </div>
 
 
-            <Button variant="outlined" size="small" className='lt-watch-text-right'>
+            <Button variant="outlined" size="small" className='lt-watch-text-right' onClick={service.onRight}>
               <i className="material-icons">
                 keyboard_arrow_right
               </i>
