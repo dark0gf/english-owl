@@ -1,21 +1,10 @@
-import PlayerFactory from 'youtube-player';
 import * as pageLoaderService from 'app/shared/page-loader/service';
 import { StoreSlicer } from 'app/slicer';
-import { IData, IPage, YouTubePlayer, IVideoData } from './interfaces';
-
-const YTPlayerState = {
-  UNSTARTED: '-1',
-  ENDED: 0,
-  PLAYING: 1,
-  PAUSED: 2,
-  BUFFERING: 3,
-  CUED: 5
-};
-
-let player: YouTubePlayer | null;
-let videoData: IVideoData | null;
+import { IData, IPage, IPlayerFactoryResult } from './interfaces';
+import { playerServiceFactory } from './player-service';
 
 const videoDataMock = {
+  videoId: 'XqZsoesa55w',
   'startFrom': 20,
   textData: [
     {'s': 27.7, 'e': 35, 't': 'Baby shark'},
@@ -34,28 +23,24 @@ const slicer = new StoreSlicer<IData>('pages.watch', {ready: false, englishText:
 slicer.resetState();
 
 let intervalId: any;
+let playerService: IPlayerFactoryResult;
 export const init = () => {
   pageLoaderService.show();
   setTimeout(() => {
     pageLoaderService.hide();
     slicer.dispatch((state: any) => ({...state, ready: true}));
-    document.addEventListener("keydown", handleKeyDown);
 
-    videoData = videoDataMock;
-    videoData.textData.sort((a, b) => (a.s - b.s));
+    playerService = playerServiceFactory(videoDataMock);
+    playerService.play();
+
     intervalId = setInterval(updateText , 25);
-    const p = (PlayerFactory('yt-player') as any);
-    player = (p as YouTubePlayer);
-
-    player.loadVideoById('XqZsoesa55w', videoData.startFrom);
-    player.playVideo();
+    document.addEventListener("keydown", handleKeyDown);
   }, 700);
 
   return () => {
     document.removeEventListener("keydown", handleKeyDown);
     clearInterval(intervalId);
-    player = null;
-    videoData = null;
+    playerService.destroy();
     slicer.resetState();
   }
 };
@@ -67,56 +52,15 @@ export const getState = (state: any): IPage => {
   };
 };
 
-
-export const onLeft = async () => {
-  console.log('--------------------------------------- onLeft');
-  if (!player || !videoData) {
-    return;
-  }
-  let index = searchForClosestPlayedIndexText(prevTime);
-  if (index < 0) {
-    return;
-  }
-  if (index > 0) {
-    index--;
-  }
-
-  const tData = videoData.textData[index];
-  player.seekTo(tData.s, true);
-
-  return updateText(tData.s);
+export const onLeft = () => {
+  playerService.seekToLeftText();
 };
 
-export const onRight = async () => {
-  console.log('--------------------------------------- onRight');
-  if (!player || !videoData) {
-    return;
-  }
-
-  const textDataLength = videoData.textData.length;
-  let index = searchForClosestPlayedIndexText(prevTime);
-  index++;
-  if (index >= textDataLength) {
-    return;
-  }
-
-  const tData = videoData.textData[index];
-  player.seekTo(tData.s, true);
-
-  return updateText(tData.s);
+export const onRight = () => {
+  playerService.seekToRightText();
 };
 
-const playPause = async () => {
-  if (!player) {
-    return;
-  }
-  const state = await player.getPlayerState();
-  if (state == YTPlayerState.PLAYING) {
-    player.pauseVideo();
-  } else {
-    player.playVideo();
-  }
-};
+const playPause = () => playerService.playPause();
 
 const handleKeyDown = (event: any) => {
   switch( event.keyCode ) {
@@ -140,30 +84,10 @@ const handleKeyDown = (event: any) => {
 };
 
 let prevText = '';
-let prevTime = 0;
 
-const updateText = async (forceTime? : number) => {
-  if (!player) {
-    return;
-  }
-  const state = await player.getPlayerState();
-  console.log('state', state);
-  let time;
-  if (forceTime) {
-    time = forceTime;
-  } else if (YTPlayerState.PLAYING == state) {
-    time = await player.getCurrentTime();
-  } else {
-    time = prevTime;
-  }
-  console.log(time);
+const updateText = async () => {
+  const text = await playerService.getCurrentText();
 
-  if (time == prevTime) {
-    return;
-  }
-  prevTime = time;
-
-  let text = searchForText(time);
   if (prevText == text) {
     return;
   }
@@ -171,32 +95,7 @@ const updateText = async (forceTime? : number) => {
   slicer.dispatch((state) => ({...state, englishText: text}));
 };
 
-const searchForText = (time: number): string  => {
-  if (!videoData) {
-    return "";
-  }
 
-  for (const tData of videoData.textData) {
-    if (tData.s <= time && time <= tData.e) {
-      return tData.t;
-    }
-  }
 
-  return "";
-};
 
-const searchForClosestPlayedIndexText = (time: number): number => {
-  if (!videoData) {
-    return -1;
-  }
-
-  let index = -1;
-  videoData.textData.forEach((tData, i) => {
-    if (tData.s <= time) {
-      index = i;
-    }
-  });
-
-  return index;
-};
 

@@ -2,6 +2,7 @@ import PlayerState from 'youtube-player/dist/constants/PlayerStates';
 import { EventType } from 'youtube-player/dist/eventNames';
 
 export interface IVideoData {
+  videoId: string,
   /**
    * youtube player will start playing from that time
    * seconds
@@ -26,6 +27,17 @@ export interface IPage {
   data: IData,
   loading: boolean,
 }
+
+export interface IPlayerFactoryResult {
+  play: () => void;
+  pause: () => void;
+  playPause: () => void;
+  seekToLeftText: () => void;
+  seekToRightText: () => void;
+  getCurrentText: () => Promise<string>;
+  destroy: () => void;
+};
+
 
 /**
  * Need this one for YouTubePlayer because types from package have not good typings
