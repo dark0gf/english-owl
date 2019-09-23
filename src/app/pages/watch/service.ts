@@ -3,14 +3,14 @@ import * as pageLoaderService from 'app/shared/page-loader/service';
 import { StoreSlicer } from 'app/slicer';
 import { IData, IPage, YouTubePlayer, IVideoData } from './interfaces';
 
-// const YTPlayerState = {
-//   UNSTARTED: '-1',
-//   ENDED: 0,
-//   PLAYING: 1,
-//   PAUSED: 2,
-//   BUFFERING: 3,
-//   CUED: 5
-// };
+const YTPlayerState = {
+  UNSTARTED: '-1',
+  ENDED: 0,
+  PLAYING: 1,
+  PAUSED: 2,
+  BUFFERING: 3,
+  CUED: 5
+};
 
 let player: YouTubePlayer | null;
 let videoData: IVideoData | null;
@@ -39,6 +39,8 @@ export const init = () => {
   setTimeout(() => {
     pageLoaderService.hide();
     slicer.dispatch((state: any) => ({...state, ready: true}));
+    document.addEventListener("keydown", handleKeyDown);
+
     videoData = videoDataMock;
     videoData.textData.sort((a, b) => (a.s - b.s));
     intervalId = setInterval(updateText , 25);
@@ -50,6 +52,7 @@ export const init = () => {
   }, 700);
 
   return () => {
+    document.removeEventListener("keydown", handleKeyDown);
     clearInterval(intervalId);
     player = null;
     videoData = null;
@@ -66,11 +69,11 @@ export const getState = (state: any): IPage => {
 
 
 export const onLeft = async () => {
+  console.log('--------------------------------------- onLeft');
   if (!player || !videoData) {
     return;
   }
-  const time = await player.getCurrentTime();
-  let index = searchForClosestPlayedIndexText(time);
+  let index = searchForClosestPlayedIndexText(prevTime);
   if (index < 0) {
     return;
   }
@@ -81,17 +84,17 @@ export const onLeft = async () => {
   const tData = videoData.textData[index];
   player.seekTo(tData.s, true);
 
-  return updateText();
+  return updateText(tData.s);
 };
 
 export const onRight = async () => {
+  console.log('--------------------------------------- onRight');
   if (!player || !videoData) {
     return;
   }
 
   const textDataLength = videoData.textData.length;
-  const time = await player.getCurrentTime();
-  let index = searchForClosestPlayedIndexText(time);
+  let index = searchForClosestPlayedIndexText(prevTime);
   index++;
   if (index >= textDataLength) {
     return;
@@ -100,18 +103,61 @@ export const onRight = async () => {
   const tData = videoData.textData[index];
   player.seekTo(tData.s, true);
 
-  return updateText();
+  return updateText(tData.s);
 };
 
+const playPause = async () => {
+  if (!player) {
+    return;
+  }
+  const state = await player.getPlayerState();
+  if (state == YTPlayerState.PLAYING) {
+    player.pauseVideo();
+  } else {
+    player.playVideo();
+  }
+};
+
+const handleKeyDown = (event: any) => {
+  switch( event.keyCode ) {
+    case 37: //left
+    case 81: //q
+      onLeft();
+      break;
+    case 39: //right
+    case 87: //e
+      onRight();
+      break;
+    case 32: //space
+      playPause();
+      if (event.target == document.body) {
+        event.preventDefault();
+      }
+      break;
+    default:
+      break;
+  }
+};
 
 let prevText = '';
 let prevTime = 0;
 
-const updateText = async () => {
+const updateText = async (forceTime? : number) => {
   if (!player) {
     return;
   }
-  const time = await player.getCurrentTime();
+  const state = await player.getPlayerState();
+  console.log('state', state);
+  let time;
+  if (forceTime) {
+    time = forceTime;
+  } else if (YTPlayerState.PLAYING == state) {
+    time = await player.getCurrentTime();
+  } else {
+    time = prevTime;
+  }
+  console.log(time);
+
   if (time == prevTime) {
     return;
   }
@@ -153,3 +199,4 @@ const searchForClosestPlayedIndexText = (time: number): number => {
 
   return index;
 };
+
