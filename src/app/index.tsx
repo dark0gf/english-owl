@@ -19,7 +19,7 @@ export const App = hot(module)(() => (
   <MuiThemeProvider theme={theme}>
     <Switch>
       <Route path="/" exact render={() => <MainLayout><Index /></MainLayout>} />
-      <Route path="/watch/:id" exact render={() => <MainLayout><Watch /></MainLayout>} />
+      <Route path="/watch/:id" exact render={({ match }) => <MainLayout><Watch videoId={match.params.id} /></MainLayout>} />
       <Route render={() => <MainLayout><NotFound /></MainLayout>}/>
     </Switch>
   </MuiThemeProvider>

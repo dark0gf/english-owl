@@ -19,3 +19,11 @@
   text-align: center;
   font-size: 1.5rem;
 }
+
+.lt-watch-text-word {
+  cursor: pointer;
+}
+
+.lt-watch-text-word:hover {
+  background-color: #ddd;
+}

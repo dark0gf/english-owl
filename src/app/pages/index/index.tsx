@@ -11,7 +11,7 @@ const connected: React.ComponentType<any> = connect(service.getState)(
       <Button variant="contained" color="primary" onClick={service.somefunc}>
         Hello World {props.data} !
       </Button>
-      <Link to={'/watch/123'}>
+      <Link to={'/watch/XqZsoesa55w'}>
         <Button variant="contained" color="primary">
           Go to watch
         </Button>

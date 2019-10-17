@@ -1,41 +1,58 @@
 import * as pageLoaderService from 'app/shared/page-loader/service';
 import { StoreSlicer } from 'app/slicer';
-import { IData, IPage, IPlayerFactoryResult } from './interfaces';
+import { IData, IEnglishTextBlock, IPage, IPlayerFactoryResult, IVideoData } from './interfaces';
 import { playerServiceFactory } from './player-service';
+import axios from 'app/shared/services/axios';
 
-const videoDataMock = {
-  videoId: 'XqZsoesa55w',
-  'startFrom': 20,
-  textData: [
-    {'s': 27.7, 'e': 35, 't': 'Baby shark'},
-    {'s': 36, 'e': 43.5, 't': 'Mommy shark'},
-    {'s': 44, 'e': 52.5, 't': 'Daddy shark'},
-    {'s': 53, 'e': 60.5, 't': 'Grandma shark'},
-    {'s': 61, 'e': 68.5, 't': 'Grandpa shark'},
-    {'s': 69, 'e': 77, 't': 'Let\'s go hunt'},
-    {'s': 78, 'e': 85, 't': 'Run away'},
-    {'s': 87, 'e': 95.5, 't': 'Safe at last'},
-    {'s': 95.6, 'e': 105, 't': 'It\'s the end'},
-  ]
-};
-
-const slicer = new StoreSlicer<IData>('pages.watch', {ready: false, englishText: ''});
+const slicer = new StoreSlicer<IData>('pages.watch', {ready: false, englishTextBlocks: []});
 slicer.resetState();
+
+const regexpWordChar = /[a-z0-9'-]/i;
 
 let intervalId: any;
 let playerService: IPlayerFactoryResult;
-export const init = () => {
-  pageLoaderService.show();
-  setTimeout(() => {
-    pageLoaderService.hide();
-    slicer.dispatch((state: any) => ({...state, ready: true}));
 
-    playerService = playerServiceFactory(videoDataMock);
+
+export const init = (videoId: string) => {
+  pageLoaderService.show();
+  axios.get(`/video/${videoId}`).then((response: {data: IVideoData}) => {
+    pageLoaderService.hide();
+    slicer.dispatch((state) => ({...state, ready: true}));
+    const data = response.data;
+
+    data.textData = data.textData.map((data) => {
+      const text = data.t;
+      const englishTextBlocks: Array<IEnglishTextBlock> = [];
+
+      let block = {text: '', isWord: false};
+      Array.from(text).forEach((char) => {
+        if (char.match(regexpWordChar)) {
+          if (block.isWord) {
+            block.text += char;
+          } else {
+            englishTextBlocks.push(block);
+            block = {text: char, isWord: true}
+          }
+        } else {
+          if (block.isWord) {
+            englishTextBlocks.push(block);
+            block = {text: char, isWord: false}
+          } else {
+            block.text += char;
+          }
+        }
+      });
+
+      englishTextBlocks.push(block);
+      return {...data, englishTextBlocks};
+    });
+
+    playerService = playerServiceFactory(data);
     playerService.play();
 
     intervalId = setInterval(updateText , 25);
     document.addEventListener("keydown", handleKeyDown);
-  }, 700);
+  });
 
   return () => {
     document.removeEventListener("keydown", handleKeyDown);
@@ -45,10 +62,11 @@ export const init = () => {
   }
 };
 
-export const getState = (state: any): IPage => {
+export const getState = (state: any, ownProps: any): IPage => {
   return {
     data: slicer.getState(state),
-    loading: pageLoaderService.getState(state).loading
+    loading: pageLoaderService.getState(state).loading,
+    videoId: ownProps.videoId
   };
 };
 
@@ -83,16 +101,16 @@ const handleKeyDown = (event: any) => {
   }
 };
 
-let prevText = '';
+let prevEnglishTextBlocks: Array<IEnglishTextBlock> = [];
 
 const updateText = async () => {
-  const text = await playerService.getCurrentText();
+  const englishTextBlocks = await playerService.getCurrentText();
 
-  if (prevText == text) {
+  if (prevEnglishTextBlocks == englishTextBlocks) {
     return;
   }
-  prevText = text;
-  slicer.dispatch((state) => ({...state, englishText: text}));
+  prevEnglishTextBlocks = englishTextBlocks;
+  slicer.dispatch((state) => ({...state, englishTextBlocks}));
 };
 
 

@@ -1,4 +1,4 @@
-import { IPlayerFactoryResult, IVideoData, YouTubePlayer } from './interfaces';
+import { IEnglishTextBlock, IPlayerFactoryResult, IVideoData, YouTubePlayer } from './interfaces';
 import PlayerFactory from 'youtube-player';
 
 export const YTPlayerState = {
@@ -64,15 +64,15 @@ export const playerServiceFactory: (videoData: IVideoData) => IPlayerFactoryResu
     return index;
   };
 
-  const getCurrentText = async (): Promise<string> => {
+  const getCurrentText = async (): Promise<Array<IEnglishTextBlock>> => {
     const time = await player.getCurrentTime();
     for (const tData of videoData.textData) {
       if (tData.s <= time && time <= tData.e) {
-        return tData.t;
+        return tData.englishTextBlocks;
       }
     }
 
-    return "";
+    return [];
   };
 
   videoData.textData.sort((a, b) => (a.s - b.s));

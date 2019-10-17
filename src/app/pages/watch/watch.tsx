@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Popup from "reactjs-popup";
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import * as service from './service';
@@ -9,12 +10,15 @@ import './styles.css';
 
 const connected: React.ComponentType<any> = connect(service.getState)(
   (props: IPage) => {
-    useEffect(() => service.init(), []);
+    useEffect(() => service.init(props.videoId), []);
 
     return <div>
       <Link to={'/'}>
         &lt; Назад
       </Link>
+
+      <br />
+      {JSON.stringify(props.data)}
 
       {props.data.ready ?
         <div>
@@ -29,9 +33,21 @@ const connected: React.ComponentType<any> = connect(service.getState)(
             </Button>
 
             <div className='lt-watch-text-content'>
-              {props.data.englishText}
+              {props.data.englishTextBlocks.map((block) =>
+                (block.isWord ?
+                  <span className='lt-watch-text-word'>{block.text}</span> :
+                  <span>{block.text}</span>
+                )
+              )}
             </div>
 
+            <Popup
+              trigger={<span>test</span>}
+              position="top center"
+              on="hover"
+            >
+              <div>Just test with work translation </div>
+            </Popup>
 
             <Button variant="outlined" size="small" className='lt-watch-text-right' onClick={service.onRight}>
               <i className="material-icons">

@@ -15,15 +15,21 @@ export interface IVideoData {
    * NOTE: array should be sorted by "s" property
    *
    **/
-  textData: Array<{s: number, e: number, t: string}>
+  textData: Array<{s: number, e: number, t: string, englishTextBlocks: Array<IEnglishTextBlock>}>
+}
+
+export interface IEnglishTextBlock {
+  text: string,
+  isWord: boolean
 }
 
 export interface IData {
   ready: boolean,
-  englishText: string
+  englishTextBlocks: Array<IEnglishTextBlock>,
 }
 
 export interface IPage {
+  videoId: string,
   data: IData,
   loading: boolean,
 }
@@ -34,7 +40,7 @@ export interface IPlayerFactoryResult {
   playPause: () => void;
   seekToLeftText: () => void;
   seekToRightText: () => void;
-  getCurrentText: () => Promise<string>;
+  getCurrentText: () => Promise<Array<IEnglishTextBlock>>;
   destroy: () => void;
 };
 
