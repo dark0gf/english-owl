@@ -20,10 +20,31 @@
   font-size: 1.5rem;
 }
 
+.lt-watch-text-icons {
+  font-size: 3rem;
+}
+
 .lt-watch-text-word {
   cursor: pointer;
 }
 
 .lt-watch-text-word:hover {
   background-color: #ddd;
+}
+
+.lt-watch-translate-container {
+  font-size: 1rem;
+  text-align: left;
+  padding: 0 10px;
+  /*width: 400px;*/
+}
+
+.lt-watch-translate-word {
+  text-align: center;
+}
+
+.lt-watch-translate-pos {
+  font-size: 0.9rem;
+  color: #aaa;
+  margin-right: 5px;
 }

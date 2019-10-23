@@ -3,6 +3,7 @@ import { StoreSlicer } from 'app/slicer';
 import { IData, IEnglishTextBlock, IPage, IPlayerFactoryResult, IVideoData } from './interfaces';
 import { playerServiceFactory } from './player-service';
 import axios from 'app/shared/services/axios';
+import axiosLib, { CancelTokenSource } from 'axios';
 
 const slicer = new StoreSlicer<IData>('pages.watch', {ready: false, englishTextBlocks: []});
 slicer.resetState();
@@ -113,7 +114,29 @@ const updateText = async () => {
   slicer.dispatch((state) => ({...state, englishTextBlocks}));
 };
 
+let axiosSource: CancelTokenSource | null;
+export const translateWord = async (word: string) => {
+  const wordTrimmed = word.trim().toLowerCase();
+  slicer.dispatch((state) => ({...state, wordTranslate: null}));
+  let translation: any;
+  try {
+    if (axiosSource) {
+      axiosSource.cancel('Canceled.');
+    }
+    axiosSource = axiosLib.CancelToken.source();
+    translation = (await axios.get(`/translate/word/${wordTrimmed}`, {cancelToken: axiosSource.token})).data;
+    axiosSource = null;
+  } catch (e) {
+    return;
+  }
 
+  console.log(translation);
+  slicer.dispatch((state) => ({...state, wordTranslate: translation}));
 
-
-
+  const popupContainer = document.querySelector('.lt-watch-text-content .popup-content') as HTMLElement;
+  if (popupContainer) {
+    const h = popupContainer.offsetHeight;
+    var topValue = parseFloat(popupContainer.style.top || '');
+    popupContainer.style.top = topValue - h + 48 + 'px';
+  }
+};

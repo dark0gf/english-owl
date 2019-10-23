@@ -1,11 +1,11 @@
 import * as React from 'react';
-import Popup from "reactjs-popup";
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import * as service from './service';
+import * as service from './services/service';
 import { connect } from 'react-redux';
-import { IPage } from './interfaces';
+import { IPage } from './services/interfaces';
 import Button from '@material-ui/core/Button';
+import Word from './word';
 import './styles.css';
 
 const connected: React.ComponentType<any> = connect(service.getState)(
@@ -18,7 +18,6 @@ const connected: React.ComponentType<any> = connect(service.getState)(
       </Link>
 
       <br />
-      {JSON.stringify(props.data)}
 
       {props.data.ready ?
         <div>
@@ -27,30 +26,22 @@ const connected: React.ComponentType<any> = connect(service.getState)(
           <div className='lt-watch-text-container'>
 
             <Button variant="outlined" size="small" className='lt-watch-text-left' onClick={service.onLeft}>
-              <i className="material-icons">
+              <i className="material-icons lt-watch-text-icons">
                 keyboard_arrow_left
               </i>
             </Button>
 
             <div className='lt-watch-text-content'>
-              {props.data.englishTextBlocks.map((block) =>
+              {props.data.englishTextBlocks.map((block, index) =>
                 (block.isWord ?
-                  <span className='lt-watch-text-word'>{block.text}</span> :
-                  <span>{block.text}</span>
+                  <Word key={index} word={block.text} translate={props.data.wordTranslate} /> :
+                  <span key={index}>{block.text}</span>
                 )
               )}
             </div>
 
-            <Popup
-              trigger={<span>test</span>}
-              position="top center"
-              on="hover"
-            >
-              <div>Just test with work translation </div>
-            </Popup>
-
             <Button variant="outlined" size="small" className='lt-watch-text-right' onClick={service.onRight}>
-              <i className="material-icons">
+              <i className="material-icons lt-watch-text-icons">
                 keyboard_arrow_right
               </i>
             </Button>

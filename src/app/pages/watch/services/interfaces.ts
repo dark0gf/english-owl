@@ -26,6 +26,7 @@ export interface IEnglishTextBlock {
 export interface IData {
   ready: boolean,
   englishTextBlocks: Array<IEnglishTextBlock>,
+  wordTranslate?: {} | null
 }
 
 export interface IPage {
