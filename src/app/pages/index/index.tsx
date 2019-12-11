@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 const connected: React.ComponentType<any> = connect(service.getState)(
   (props: IPage) => {
     return <div>
-      <Button variant="contained" color="primary" onClick={service.somefunc}>
+      <Button variant="contained" color="primary" onClick={() => {}}>
         Hello World {props.data} !
       </Button>
       <Link to={'/watch/XqZsoesa55w'}>

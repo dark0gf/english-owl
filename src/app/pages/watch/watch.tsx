@@ -5,6 +5,7 @@ import * as service from './services/service';
 import { connect } from 'react-redux';
 import { IPage } from './services/interfaces';
 import Button from '@material-ui/core/Button';
+import Loader from 'app/shared/loader/loader';
 import Word from './word';
 import './styles.css';
 
@@ -16,10 +17,8 @@ const connected: React.ComponentType<any> = connect(service.getState)(
       <Link to={'/'}>
         &lt; Назад
       </Link>
-
       <br />
-
-      {props.data.ready ?
+      <Loader isLoading={!props.data.ready}>
         <div>
           <div id='yt-player' className='lt-watch-yt-container'>
           </div>
@@ -48,7 +47,7 @@ const connected: React.ComponentType<any> = connect(service.getState)(
 
           </div>
         </div>
-        : ''}
+      </Loader>
     </div>;
   }
 );

@@ -1,9 +1,9 @@
-import * as pageLoaderService from 'app/shared/page-loader/service';
 import { StoreSlicer } from 'app/slicer';
 import { IData, IEnglishTextBlock, IPage, IPlayerFactoryResult, IVideoData } from './interfaces';
 import { playerServiceFactory } from './player-service';
 import axios from 'app/shared/services/axios';
 import axiosLib, { CancelTokenSource } from 'axios';
+import {isEqual} from 'lodash';
 
 const slicer = new StoreSlicer<IData>('pages.watch', {ready: false, englishTextBlocks: []});
 slicer.resetState();
@@ -15,9 +15,7 @@ let playerService: IPlayerFactoryResult;
 
 
 export const init = (videoId: string) => {
-  pageLoaderService.show();
   axios.get(`/video/${videoId}`).then((response: {data: IVideoData}) => {
-    pageLoaderService.hide();
     slicer.dispatch((state) => ({...state, ready: true}));
     const data = response.data;
 
@@ -66,7 +64,6 @@ export const init = (videoId: string) => {
 export const getState = (state: any, ownProps: any): IPage => {
   return {
     data: slicer.getState(state),
-    loading: pageLoaderService.getState(state).loading,
     videoId: ownProps.videoId
   };
 };
@@ -106,8 +103,7 @@ let prevEnglishTextBlocks: Array<IEnglishTextBlock> = [];
 
 const updateText = async () => {
   const englishTextBlocks = await playerService.getCurrentText();
-
-  if (prevEnglishTextBlocks == englishTextBlocks) {
+  if (isEqual(prevEnglishTextBlocks, englishTextBlocks)) {
     return;
   }
   prevEnglishTextBlocks = englishTextBlocks;

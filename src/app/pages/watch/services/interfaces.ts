@@ -32,7 +32,6 @@ export interface IData {
 export interface IPage {
   videoId: string,
   data: IData,
-  loading: boolean,
 }
 
 export interface IPlayerFactoryResult {
