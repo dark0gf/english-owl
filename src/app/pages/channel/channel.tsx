@@ -1,54 +1,46 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
-import * as service from './service';
-import Button from '@material-ui/core/Button';
-import { IPage } from './service';
 import { Link } from 'react-router-dom';
-import {getAllCategories} from './service';
-import { IChannelResponse } from 'app/shared/common.interfaces';
+import { IChannelResponse, IVideoResponse } from 'app/shared/common.interfaces';
+import { getVideosByCategory } from 'app/shared/services/video.service';
 
-const connected: React.ComponentType<any> = connect(service.getState)(
-  (props: IPage) => {
-    return <div className="">
-      <Button variant="contained" color="primary" onClick={() => {}}>
-        Hello World {props.data} !
-      </Button>
-      <Link to={'/watch/XqZsoesa55w'}>
-        <Button variant="contained" color="primary">
-          Go to watch
-        </Button>
-      </Link>
-      <h1>{props.count}</h1>
-
-    </div>
-  }
-);
-
-export default connected;
-
-
-interface IState {
-  channels: IChannelResponse[]
+interface IProps {
+  channelId: string
 }
 
-export class IndexPage extends React.Component<{}, IState> {
+interface IState {
+  videos: IVideoResponse[] | null,
+  channel: IChannelResponse | null,
+
+}
+
+export class ChannelPage extends React.Component<IProps, IState> {
   state: Readonly<IState> = {
-    channels: []
+    videos: null,
+    channel: null,
   };
 
-  async componentDidMount() {
-    const channels = await getAllCategories();
-    this.setState(() => ({...this.state, channels}));
+  componentDidMount(): void {
+    this.loadVideos();
+  }
+
+  componentDidUpdate(prevProps: IProps) {
+    if (prevProps.channelId !== this.props.channelId) {
+      this.loadVideos();
+    }
+  }
+
+  private async loadVideos(): Promise<void> {
+    const videos = await getVideosByCategory(this.props.channelId);
+    this.setState((state) => ({...state, videos}));
   }
 
   render = () => <div className="flex flex-wrap">
-    {this.state.channels.map((channel) =>
-      <div className="flex-grow-0 flex-shrink-0 flex-basis-25 p-1">
-        <Link to={`/channel/${channel.id}`} className="hover:no-underline">
-          <div className="">
-            <img className="mx-auto" src={channel.image}/>
-            <div className="text-2xl text-center">{channel.title}</div>
-            <div className="position-relative h-12 overflow-hidden fade-ellipsis">{channel.description}</div>
+    {this.state.videos?.map((video) =>
+      <div key={video.videoId} className="flex-grow-0 flex-shrink-0 w-1/3 xl:w-1/4 p-1 ">
+        <Link to={`/channel/${video.videoId}`} className="hover:no-underline">
+          <div className="position-relative">
+            <img className="mx-auto" src={video.image}/>
+            <div className="font-weight-bold text-center h-12 overflow-hidden fade-ellipsis">{video.title}</div>
           </div>
         </Link>
       </div>

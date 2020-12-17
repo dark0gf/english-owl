@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  a:hover {
+    @apply no-underline;
+  }
+}
+
 @layer utilities {
   .flex-basis-25 {
     flex-basis: 25%;

@@ -6,8 +6,6 @@ export interface IPage {
   count: number
 }
 
-
-
 const slicer = new StoreSlicer<IPage>('pages.index', {data: 'foo', count: 0});
 slicer.resetState();
 
