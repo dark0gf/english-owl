@@ -21,17 +21,11 @@ const MainLayout = ({ children }: { children: any }) => (<div>
        >
          English Owl
        </Typography>
-      {/*<Button variant="outlined" size="small" className='mr-2'>*/}
-      {/*  Войти*/}
-      {/*</Button>*/}
-      {/*<Button variant="outlined" size="small">*/}
-      {/*  Зарегистрироваться*/}
-      {/*</Button>*/}
     </Toolbar>
 
     {children}
 
-    <Toolbar><Typography align="center" style={{flex: 1}}>English Owl 2019 (c)</Typography></Toolbar>
+    <Toolbar><Typography align="center" style={{flex: 1}}>English Owl 2021 (c)</Typography></Toolbar>
 
   </Container>
 </div>);

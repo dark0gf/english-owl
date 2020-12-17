@@ -56,17 +56,18 @@ export const init = (videoId: string) => {
   return () => {
     document.removeEventListener("keydown", handleKeyDown);
     clearInterval(intervalId);
-    playerService.destroy();
+    if (playerService) {
+      playerService.destroy();
+    }
     slicer.resetState();
   }
 };
 
-export const getState = (state: any, ownProps: any): IPage => {
-  return {
-    data: slicer.getState(state),
-    videoId: ownProps.videoId
-  };
-};
+export const getState = (state: any, ownProps: any): IPage => ({
+  data: slicer.getState(state),
+  videoId: ownProps.videoId
+});
+
 
 export const onLeft = () => {
   playerService.seekToLeftText();
@@ -126,7 +127,6 @@ export const translateWord = async (word: string) => {
     return;
   }
 
-  console.log(translation);
   slicer.dispatch((state) => ({...state, wordTranslate: translation}));
 
   const popupContainer = document.querySelector('.lt-watch-text-content .popup-content') as HTMLElement;

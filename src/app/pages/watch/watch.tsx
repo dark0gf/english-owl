@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import * as service from './services/service';
 import { connect } from 'react-redux';
@@ -9,48 +9,51 @@ import Loader from 'app/shared/loader/loader';
 import Word from './word';
 import './styles.css';
 
-const connected: React.ComponentType<any> = connect(service.getState)(
-  (props: IPage) => {
-    useEffect(() => service.init(props.videoId), []);
+const connected: React.ComponentType<any> = connect(service.getState)((props: IPage) => {
+  useEffect(() => service.init(props.videoId), []);
 
-    return <div>
-      <Link to={'/'}>
-        &lt; Назад
-      </Link>
-      <br />
-      <Loader isLoading={!props.data.ready}>
-        <div>
-          <div id='yt-player' className='lt-watch-yt-container'>
-          </div>
-          <div className='lt-watch-text-container'>
+  const [foo, setFoo] = useState({value: '', refresh: 0});
 
-            <Button variant="outlined" size="small" className='lt-watch-text-left' onClick={service.onLeft}>
-              <i className="material-icons lt-watch-text-icons">
-                keyboard_arrow_left
-              </i>
-            </Button>
+  return <div>
+    <Link to={'/'}>
+      &lt; Назад
+    </Link>
+    <br />
+    <button onClick={() => setFoo({value: 'from parent', refresh: foo.refresh + 1})}>change foo</button>
 
-            <div className='lt-watch-text-content'>
-              {props.data.englishTextBlocks.map((block, index) =>
-                (block.isWord ?
-                  <Word key={index} word={block.text} translate={props.data.wordTranslate} /> :
-                  <span key={index}>{block.text}</span>
-                )
-              )}
-            </div>
-
-            <Button variant="outlined" size="small" className='lt-watch-text-right' onClick={service.onRight}>
-              <i className="material-icons lt-watch-text-icons">
-                keyboard_arrow_right
-              </i>
-            </Button>
-
-          </div>
+    <br />
+    <Loader isLoading={!props.data.ready}>
+      <div>
+        <div id='yt-player' className='lt-watch-yt-container'>
         </div>
-      </Loader>
-    </div>;
-  }
-);
+        <div className='lt-watch-text-container'>
+
+          <Button variant="outlined" size="small" className='lt-watch-text-left' onClick={service.onLeft}>
+            <i className="material-icons lt-watch-text-icons">
+              keyboard_arrow_left
+            </i>
+          </Button>
+
+          <div className='lt-watch-text-content'>
+            {props.data.englishTextBlocks.map((block, index) =>
+              (block.isWord ?
+                <Word key={index} word={block.text} translate={props.data.wordTranslate} /> :
+                <span key={index}>{block.text}</span>
+              )
+            )}
+          </div>
+
+          <Button variant="outlined" size="small" className='lt-watch-text-right' onClick={service.onRight}>
+            <i className="material-icons lt-watch-text-icons">
+              keyboard_arrow_right
+            </i>
+          </Button>
+
+        </div>
+      </div>
+    </Loader>
+  </div>;
+});
 
 export default connected;
 

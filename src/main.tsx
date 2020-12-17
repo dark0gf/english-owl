@@ -8,6 +8,7 @@ import { createStore, Store } from 'redux';
 import { connectStore, wrapReducer } from 'app/slicer';
 import { RootState } from './compose.shared';
 // import 'bootstrap-css-only/css/bootstrap.css';
+import './styles.tailwind.css';
 
 const history = createBrowserHistory();
 
