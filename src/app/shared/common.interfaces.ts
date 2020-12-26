@@ -11,5 +11,6 @@ export interface IVideoResponse {
   textData: [{s: number, e: number, t: string, rt: string}?];
   image: string,
   title: string,
-  description: string
+  description: string,
+  duration: number
 }
